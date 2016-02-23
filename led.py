@@ -54,7 +54,7 @@ def updateClock():
 				if hour_str[1] == 0:
 					strip.setPixelColor(hour_str[0] + 1, placeholder)
 					inuseHour = hour_str[0]
-					for x in range(1, 16):
+					for x in range(1, 20 ):
 						strip.setPixelColor(inuseHour + 3 + int(minute_str[0]) + x, Color(0, 0, 0))
 				else:
 					for x in xrange(hour_str[1]):

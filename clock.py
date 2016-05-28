@@ -129,7 +129,6 @@ def updateClock():
 		if forceupdate == 1:
 			forceupdate = 0
 		time.sleep(1)
-		#Check hour, minute, second
 
 def brightnessUpdate():
 	def lightSens(x):
@@ -150,8 +149,7 @@ def brightnessUpdate():
 			for i in range(0,5):
 				while running == 1:
 					brightness.append(lightSens(lightSensPin))
-					time.sleep(0.1)
-#			print (brightness, float(sum(brightness)/len(brightness)))
+					time.sleep(1)
 			return float(sum(brightness)/len(brightness))
 	#Variables for following equation
 	a = 111.63
@@ -163,19 +161,10 @@ def brightnessUpdate():
 	while running == 1:
 		ambientLight2 = averageBrightness()
 		if ambientLight1 != ambientLight2 or firstrun == 1:
-#			averageBrightnessNumerical = averageBrightness() #just putting this data into a variable.
-#			print averageBrightnessNumerical
-#			strip.setBrightness((a * math.pow(b,int(averageBrightnessNumerical))))
 			ambientLight1 = ambientLight2
-#			adjustedBrightness = ambientLight2
-#			if adjustedBrightness > 100:
-#			print ambientLight2
 			adjustedBrightness = math.ceil(a * math.pow(b,ambientLight2))
-#			print adjustedBrightness
 			if adjustedBrightness > 100:
 				adjustedBrightness = 100
-#				print('I adjusted my brightness!')
-#				print adjustedBrightness	
 			strip.setBrightness(int(adjustedBrightness))
 			strip.show()
 			print ('Brightness -', adjustedBrightness)
@@ -186,8 +175,7 @@ def brightnessUpdate():
 		time.sleep(1)
 
 def weather(): #Run the entirity of this function once every 3 minutes, or 180 seconds. 
-#	try:
-#		testalert = 'HEA'
+#		testalert = 'HEA' #If you want to test an alert type, uncomment tihs variable and the code below that refers to it. Take care to comment the code that it replaces, though. 
 		global strip
 		global defaultColor
 		time_marker = 0
@@ -211,10 +199,15 @@ def weather(): #Run the entirity of this function once every 3 minutes, or 180 s
 						defaultColor = Color(255, 147, 41)
 				except IndexError:
 					print('Currently, there are no severe weather alerts for your area.')
+					defaultColor = Color(255, 147, 41) #We know of this error and there are no weather alerts, so make sure the second indicator is its normal color
+					pass
+				except requests.ConnectionError:
+					print("There's an issue with the network.")
+					defaultColor = Color(255, 0, 0) #Indicate an error
 					pass
 				except:
-					defaultColor = Color(255, 0, 0)
-					break
+					defaultColor = Color(255, 0, 0) #Indicate an error
+					raise
 			else:
 				time.sleep(1) 
 
@@ -234,7 +227,6 @@ def weather(): #Run the entirity of this function once every 3 minutes, or 180 s
 def startThreads():
 	try:
 		global running
-		global weatherThread
 		closing_event = threading.Event()
 		closing_event.set()
 		brightnessThread = threading.Thread(target=brightnessUpdate)

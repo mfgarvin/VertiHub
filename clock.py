@@ -3,6 +3,7 @@ from neopixel import *
 import threading
 import math
 import RPi.GPIO as GPIO
+import requests
 defaultColor = Color(255, 147, 41)
 minuteColor = Color(255, 147, 41)
 hourColor = Color(255, 147, 41)
@@ -10,7 +11,15 @@ red = Color(255, 0, 0)
 green = Color(0, 255, 0)
 blue = Color(0, 0, 255)
 off = Color(0, 0, 0)
+white = Color(255, 255, 255)
 placeholder = blue
+
+#Weather Underground
+APIKEY = "0f9045beb1c7e0e7"
+CITY = "Cuyahoga_Falls"
+STATE = "OH"
+INDICATOR = {'TOR': 'Color(255, 0, 0)', 'TOW': 'Color(255, 0, 0)', 'WRN': 'Color(255, 168, 0)', 'SEW': 'Color(255, 168, 0)', 'WIN': 'Color(77, 233, 255)', 'FLO': 'Color(5, 255, 0)', 'WAT': 'Color(5, 255, 0)', 'WND': 'Color(33, 255, 135)', 'HEA': 'Color(255, 81, 20)'} 
+update_interval = 180 #In seconds
 
 #GPIO
 GPIO.setmode(GPIO.BCM)
@@ -21,8 +30,7 @@ LED_COUNT = 30 #Number of LED Pixels.
 LED_PIN = 18 #GPIO pin connected to the pixels (must support PWM!)
 LED_FREQ_HZ = 800000 #LED signal frequency in hertz (usually 800khz)
 LED_DMA = 5 #DMA channel to use for generating signal (try 5)
-LED_BRIGHTNESS = 100 #Set to 0 for darkest and 255 for brightest. 100 is the most my power supply will support.
-#LED_BRIGHTNESS = 3 #Set to 0 for darkest and 255 for brightest. 100 is the most my power supply will support.
+LED_BRIGHTNESS = 74 #Set to 0 for darkest and 255 for brightest. 100 is the most my power supply will support.
 LED_INVERT = False #True to invert the signal (when using NPN transistor level shift)
 
 strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
@@ -36,6 +44,7 @@ def timeCheck():
 def updateClock():
 	global running
 	global forceupdate
+	global strip
 	hour = time.localtime().tm_hour
 	minute = time.localtime().tm_min
 	second = 'OFF'
@@ -124,21 +133,26 @@ def updateClock():
 
 def brightnessUpdate():
 	def lightSens(x):
-		reading = 0
-		GPIO.setup(x, GPIO.OUT)
-		GPIO.output(x, GPIO.LOW)
-		time.sleep(0.1)
-		GPIO.setup(x, GPIO.IN)
-		while (GPIO.input(x) == GPIO.LOW):
-			reading += 1
-		return reading
-	def averageBrightness():
-		brightness = []
-		for i in range(0,5):
-			brightness.append(lightSens(lightSensPin))
+		global running
+		while running == 1:
+			reading = 0
+			GPIO.setup(x, GPIO.OUT)
+			GPIO.output(x, GPIO.LOW)
 			time.sleep(0.1)
-#		print (brightness, float(sum(brightness)/len(brightness)))
-		return float(sum(brightness)/len(brightness))
+			GPIO.setup(x, GPIO.IN)
+			while (GPIO.input(x) == GPIO.LOW):
+				reading += 1
+			return reading
+	def averageBrightness():
+		global running
+		brightness = []
+		while running == 1:
+			for i in range(0,5):
+				while running == 1:
+					brightness.append(lightSens(lightSensPin))
+					time.sleep(0.1)
+#			print (brightness, float(sum(brightness)/len(brightness)))
+			return float(sum(brightness)/len(brightness))
 	#Variables for following equation
 	a = 111.63
 	b = 0.999998
@@ -169,17 +183,66 @@ def brightnessUpdate():
 				firstrun = 0
 		else:
 			pass
-#		time.sleep(1)
+		time.sleep(1)
 
+def weather(): #Run the entirity of this function once every 3 minutes, or 180 seconds. 
+#	try:
+#		testalert = 'HEA'
+		global strip
+		global defaultColor
+		time_marker = 0
+		while running == 1:
+			if time_marker + update_interval <= time.time():
+				time_marker = time.time()
+				try:
+					r = requests.get('http://api.wunderground.com/api/' + str(APIKEY) + '/alerts/hourly/q/' + str(STATE) + '/' + str(CITY) + '.json')
+					# Parsing and displaying the probability of precip.
+					pop = "Color(0, 0, " + str(int((float(str(r.json()['hourly_forecast'][0]['pop']))/100)*255)) + ")"
+					strip.setPixelColor(strip.numPixels() - 3, eval(pop))
+					# Checking for weather alerts, comparing them against my dictionary of color values, and displaying them.
+					strip.setPixelColor(strip.numPixels() - 2, INDICATOR[str(r.json()['alerts'][0]['type'])])
+#					strip.setPixelColor(strip.numPixels() - 2, eval(INDICATOR[testalert]))
+					if str(r.json()['alerts'][0]['type']) == 'TOR' or 'WRN' or 'FLO': 
+#					if str(testalert) == 'TOR' or str(testalert) == 'WRN' or str(testalert) == 'FLO': 
+						defaultColor = INDICATOR[str(r.json()['alerts'][0]['type'])] 
+#						print(INDICATOR[str(testalert)]) 
+#						defaultColor = eval(INDICATOR[str(testalert)])
+					else:
+						defaultColor = Color(255, 147, 41)
+				except IndexError:
+					print('Currently, there are no severe weather alerts for your area.')
+					pass
+				except:
+					defaultColor = Color(255, 0, 0)
+					break
+			else:
+				time.sleep(1) 
+
+# Supported Alerts
+# TOR - Tornado Warning
+# TOW - Tornado Watch
+# WRN - Severe Thunderstorm Warning
+# SEW - Severe Thunderstorm Watch
+# WIN - Winter Weather
+# FLO - Flood Warning
+# WAT - Flood Watch
+# WND - Wind Advisory
+# HEA - Heat Advisory
+#
+# Watches will consist of a solid color above the second indicator
+# Warnings will consist of a solid color above the second indicator as well as having the second indicator the same color
 def startThreads():
 	try:
 		global running
+		global weatherThread
 		closing_event = threading.Event()
 		closing_event.set()
 		brightnessThread = threading.Thread(target=brightnessUpdate)
 		clockThread = threading.Thread(target=updateClock)
+		weatherThread = threading.Thread(target=weather)
 		brightnessThread.start()
 		clockThread.start()
+		weatherThread.start()
 		while True:
 			time.sleep(0.5)
 			if not closing_event.is_set():
@@ -190,6 +253,7 @@ def startThreads():
 		running = 0
 		brightnessThread.join()
 		clockThread.join()
+		weatherThread.join()
 		for n in range(0,30):
 			strip.setPixelColor(n, off)
 			strip.show()
@@ -199,5 +263,3 @@ if __name__ == '__main__':
 	running = 1
 	strip.begin()
 	startThreads()
-#	brightnessUpdate()
-#	updateClock()	

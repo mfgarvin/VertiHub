@@ -141,19 +141,20 @@ def brightnessUpdate():
 			GPIO.setup(x, GPIO.IN)
 			while (GPIO.input(x) == GPIO.LOW):
 				reading += 1
+				time.sleep(0.5)
 			return reading
 	def averageBrightness():
 		global running
 		brightness = []
 		while running == 1:
 			for i in range(0,5):
-				while running == 1:
+				if running == 1:
 					brightness.append(lightSens(lightSensPin))
-					time.sleep(1)
+					time.sleep(0.1)
 			return float(sum(brightness)/len(brightness))
 	#Variables for following equation
-	a = 111.63
-	b = 0.999998
+	a = 103.1389768
+	b = 0.9695655616
 	global strip
 	global forceupdate
 	firstrun = 1

@@ -15,7 +15,7 @@ white = Color(255, 255, 255)
 placeholder = blue
 
 #Weather Underground
-APIKEY = "0f9045beb1c7e0e7"
+APIKEY = "36dbaf4c441591ef"
 CITY = "Cuyahoga_Falls"
 STATE = "OH"
 INDICATOR = {'TOR': 'Color(255, 0, 0)', 'TOW': 'Color(255, 0, 0)', 'WRN': 'Color(255, 168, 0)', 'SEW': 'Color(255, 168, 0)', 'WIN': 'Color(77, 233, 255)', 'FLO': 'Color(5, 255, 0)', 'WAT': 'Color(5, 255, 0)', 'WND': 'Color(33, 255, 135)', 'HEA': 'Color(255, 81, 20)'} 
@@ -30,7 +30,7 @@ LED_COUNT = 30 #Number of LED Pixels.
 LED_PIN = 18 #GPIO pin connected to the pixels (must support PWM!)
 LED_FREQ_HZ = 800000 #LED signal frequency in hertz (usually 800khz)
 LED_DMA = 5 #DMA channel to use for generating signal (try 5)
-LED_BRIGHTNESS = 74 #Set to 0 for darkest and 255 for brightest. 100 is the most my power supply will support.
+LED_BRIGHTNESS = 100 #Set to 0 for darkest and 255 for brightest. 100 is the most my power supply will support.
 LED_INVERT = False #True to invert the signal (when using NPN transistor level shift)
 
 strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
@@ -97,7 +97,9 @@ def updateClock():
 #			print(minute)
 #			print(inuseHour)
 			#minute action here
-			print(hour, minute)
+#			print(hour, minute)  #Use this to show the actual time values that are being calculated by the above code. 
+#			#Otherwise, if it's working fine, just use time.strftime to display a user-friendly time. 
+			print time.strftime("%-I:%M %p, %A %B %d, %Y")
 			if minute == 0:
 				for x in xrange(inuseHour + 1, inuseHour + 15):
 					strip.setPixelColor(x, Color(0, 0, 0))	#Clear the minutes
@@ -117,12 +119,12 @@ def updateClock():
 						strip.setPixelColor(inuseHour + 3 + int(minute_str[0]) + 1 + x, minuteColor)
 		if second == 'OFF':
 			#Turn LED On
-			print('on')
+#			print('on')
 			second = 'ON'
 			strip.setPixelColor(strip.numPixels() - 1, defaultColor)
 		elif second == 'ON':
 			#Turn LED Off
-			print('off')
+#			print('off')
 			second = 'OFF'
 			strip.setPixelColor(strip.numPixels() - 1, Color(0, 0, 0))
 		strip.show()
@@ -176,7 +178,7 @@ def brightnessUpdate():
 		time.sleep(1)
 
 def weather(): #Run the entirity of this function once every 3 minutes, or 180 seconds. 
-#		testalert = 'HEA' #If you want to test an alert type, uncomment tihs variable and the code below that refers to it. Take care to comment the code that it replaces, though. 
+#		testalert = 'SVR' #If you want to test an alert type, uncomment tihs variable and the code below that refers to it. Take care to comment the code that it replaces, though. 
 		global strip
 		global defaultColor
 		time_marker = 0
@@ -184,27 +186,38 @@ def weather(): #Run the entirity of this function once every 3 minutes, or 180 s
 			if time_marker + update_interval <= time.time():
 				time_marker = time.time()
 				try:
-					r = requests.get('http://api.wunderground.com/api/' + str(APIKEY) + '/alerts/hourly/q/' + str(STATE) + '/' + str(CITY) + '.json')
+					r = requests.get('http://api.wunderground.com/api/' + str(APIKEY) + '/alerts/hourly/q/' + str(STATE) + '/' + str(CITY) + '.json?apiref=0bcd59e502b38b2e')
 					# Parsing and displaying the probability of precip.
+#					alertval = str(r.json()['alerts'][0]['type']) 
 					pop = "Color(0, 0, " + str(int((float(str(r.json()['hourly_forecast'][0]['pop']))/100)*255)) + ")"
+					popval = r.json()['hourly_forecast'][0]['pop']
 					strip.setPixelColor(strip.numPixels() - 3, eval(pop))
 					# Checking for weather alerts, comparing them against my dictionary of color values, and displaying them.
-					strip.setPixelColor(strip.numPixels() - 2, INDICATOR[str(r.json()['alerts'][0]['type'])])
+					strip.setPixelColor(strip.numPixels() - 2, eval(INDICATOR[str(r.json()['alerts'][0]['type'])]))
 #					strip.setPixelColor(strip.numPixels() - 2, eval(INDICATOR[testalert]))
 					if str(r.json()['alerts'][0]['type']) == 'TOR' or 'WRN' or 'FLO': 
 #					if str(testalert) == 'TOR' or str(testalert) == 'WRN' or str(testalert) == 'FLO': 
-						defaultColor = INDICATOR[str(r.json()['alerts'][0]['type'])] 
+						defaultColor = eval(INDICATOR[str(r.json()['alerts'][0]['type'])]) 
 #						print(INDICATOR[str(testalert)]) 
 #						defaultColor = eval(INDICATOR[str(testalert)])
 					else:
 						defaultColor = Color(255, 147, 41)
 				except IndexError:
-					print('Currently, there are no severe weather alerts for your area.')
+					print('Currently, there are no severe weather alerts for your area, though there is a', eval(popval), '% chance of precip.')
+#					print ", ".join('Currently, there are no severe weather alerts for your area, though there is a', eval(pop),'% chance of precip.')
 					defaultColor = Color(255, 147, 41) #We know of this error and there are no weather alerts, so make sure the second indicator is its normal color
 					pass
 				except requests.ConnectionError:
 					print("There's an issue with the network.")
 					defaultColor = Color(255, 0, 0) #Indicate an error
+					pass
+#				except requests.JSONDecodeError:
+				except ValueError:
+					print("There's an isse with the .json file we pulled down. Trying again in a few minutes.")
+					defaultColor = Color(255, 0, 0)
+					pass
+				except KeyError:
+					print("There's a weather situation, but it doesn't apply to this program.")
 					pass
 				except:
 					defaultColor = Color(255, 0, 0) #Indicate an error

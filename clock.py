@@ -16,7 +16,7 @@ placeholder = blue
 
 #Weather Underground
 APIKEY = "36dbaf4c441591ef"
-CITY = "Cuyahoga_Falls"
+CITY = "Wickliffe"
 STATE = "OH"
 INDICATOR = {'TOR': 'Color(255, 0, 0)', 'TOW': 'Color(255, 0, 0)', 'WRN': 'Color(255, 168, 0)', 'SEW': 'Color(255, 168, 0)', 'WIN': 'Color(77, 233, 255)', 'FLO': 'Color(5, 255, 0)', 'WAT': 'Color(5, 255, 0)', 'WND': 'Color(33, 255, 135)', 'HEA': 'Color(255, 81, 20)'} 
 update_interval = 180 #In seconds
@@ -149,7 +149,7 @@ def brightnessUpdate():
 		global running
 		brightness = []
 		while running == 1:
-			for i in range(0,5):
+			for i in range(0,3):
 				if running == 1:
 					brightness.append(lightSens(lightSensPin))
 					time.sleep(0.1)
@@ -195,7 +195,8 @@ def weather(): #Run the entirity of this function once every 3 minutes, or 180 s
 					# Checking for weather alerts, comparing them against my dictionary of color values, and displaying them.
 					strip.setPixelColor(strip.numPixels() - 2, eval(INDICATOR[str(r.json()['alerts'][0]['type'])]))
 #					strip.setPixelColor(strip.numPixels() - 2, eval(INDICATOR[testalert]))
-					if str(r.json()['alerts'][0]['type']) == 'TOR' or 'WRN' or 'FLO': 
+					alert = str(r.json()['alerts'][0]['type'])
+					if alert == 'TOR' or alert == 'WRN' or alert == 'FLO': 
 #					if str(testalert) == 'TOR' or str(testalert) == 'WRN' or str(testalert) == 'FLO': 
 						defaultColor = eval(INDICATOR[str(r.json()['alerts'][0]['type'])]) 
 #						print(INDICATOR[str(testalert)]) 

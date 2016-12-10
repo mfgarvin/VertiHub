@@ -14,11 +14,51 @@ off = Color(0, 0, 0)
 white = Color(255, 255, 255)
 placeholder = blue
 
+# Code Storage
+# Precip
+
+#print input in conditions
+#print conditions[input]
+#print popIndic
+#Temp
+#colorval = []
+#temp = 113 #This needs to be extrapolated from the WU data
+#def colorCalc(temp, focus):
+#	result = -abs((256/28)*temp - ((256/28) * focus)) + 256
+#	if result < 0: #If the result is subzero,
+#		result = 0
+#	return result
+#
+#def blueCalc(temp):
+#	return colorCalc(temp, 30)
+#
+#def greenCalc(temp):
+#	return colorCalc(temp, 60)
+#
+#def redCalc(temp):
+#	return colorCalc(temp,90)
+#
+#def whiteCalc(temp):
+#	if temp <= 30:
+#		return colorCalc(temp, 0)
+#	elif temp >= 90:
+#		return colorCalc(temp, 120)
+#colorval.insert(0, redCalc(temp) + whiteCalc(temp))
+#colorval.insert(1, greenCalc(temp) + whiteCalc(temp))
+#colorval.insert(2, blueCalc(temp) + whiteCalc(temp))
+##rgb = "Color(" + str(colorval[0]), str(colorval[1]), str(colorval[2]) + ")"
+#rgb = "Color(" + `colorval[0]` +", " +  `colorval[1]` + ", " + `colorval[2]` + ")"
+#print rgb
+##strip.setPixelColor(strip.numPixels() - 4, eval(rgb))
+
+
 #Weather Underground
 APIKEY = "36dbaf4c441591ef"
 CITY = "Wickliffe"
 STATE = "OH"
 INDICATOR = {'TOR': 'Color(255, 0, 0)', 'TOW': 'Color(255, 0, 0)', 'WRN': 'Color(255, 168, 0)', 'SEW': 'Color(255, 168, 0)', 'WIN': 'Color(77, 233, 255)', 'FLO': 'Color(5, 255, 0)', 'WAT': 'Color(5, 255, 0)', 'WND': 'Color(33, 255, 135)', 'HEA': 'Color(255, 81, 20)'} 
+#conditions = {'Light Drizzle': 0, 'Drizzle': 0, 'Heavy Drizzle': 0, 'Light Rain': 0, 'Rain': 0, 'Heavy Rain': 0, 'Light Snow': 1, 'Snow': 1, 'Heavy Snow': 1, 'Light Snow Grains': 1, 'Snow Grains': 1, 'Heavy Snow Grains': 1, 'Light Ice Crystals': 1, 'Ice Crystals': 1, 'Heavy Ice Crystals': 1, 'Light Ice Pellets': 1, 'Ice Pellets': 1, 'Heavy Ice Pellets': 1, 'Light Hail': 0, 'Hail': 0, 'Heavy Hail': 0, 'Light Mist': 0, 'Mist': 0, 'Heavy Mist': 0, 'Light Fog Patches': 0, 'Fog Patches': 0, 'Heavy Fog Patches': 0, 'Light Smoke': 2, 'Smoke': 2, 'Heavy Smoke': 2, 'Light Volcanic Ash': 2, 'Volcanic Ash': 2, 'Heavy Volcanic Ash': 2, 'Light Widespread Dust': 2, 'Widespread Dust': 2, 'Heavy Widespread Dust': 2, 'Light Sand': 2, 'Sand': 2, 'Heavy Sand': 2, 'Light Haze': 0, 'Haze': 0, 'Heavy Haze': 0, 'Light Spray': 0, 'Spray': 0, 'Heavy Spray': 0, 'Light Dust Whirls': 2, 'Dust Whirls': 2, 'Heavy Dust Whirls': 2, 'Light Sandstorm': 2, 'Sandstorm': 2, 'Heavy Sandstorm': 2, 'Light Low Drifting Snow': 1, 'Low Drifting Snow': 1, 'Heavy Low Drifting Snow': 1, 'Light Low Drifting Widespread Dust': 2, 'Low Drifting Widespread Dust': 2, 'Heavy Low Drifting Widespread Dust': 2, 'Light Low Drifting Sand': 2, 'Low Drifting Sand': 2, 'Heavy Low Drifting Sand': 2, 'Light Blowing Snow': 1, 'Blowing Snow': 1, 'Heavy Blowing Snow': 1, 'Light Blowing Widespread Dust': 2, 'Blowing Widespread Dust': 2, 'Heavy Blowing Widespread Dust': 2, 'Light Blowing Sand': 2, 'Blowing Sand': 2, 'Heavy Blowing Sand': 2, 'Light Rain Mist': 0, 'Rain Mist': 0, 'Heavy Rain Mist': 0, 'Light Rain Showers': 0, 'Rain Showers': 0, 'Heavy Rain Showers': 0, 'Light Snow Showers': 1, 'Snow Showers': 1, 'Heavy Snow Showers': 1, 'Light Snow Blowing Snow Mist': 1, 'Snow Blowing Snow Mist': 1, 'Heavy Snow Blowing Snow Mist': 1, 'Light Ice Pellet Showers': 1, 'Ice Pellet Showers': 1, 'Heavy Ice Pellet Showers': 1, 'Light Hail Showers': 0, 'Hail Showers': 0, 'Heavy Hail Showers': 0, 'Light Small Hail Showers': 0, 'Small Hail Showers': 0, 'Heavy Small Hail Showers': 0, 'Light Thunderstorms': 0, 'Thunderstorms': 0, 'Heavy Thunderstorms': 0, 'Light Thunderstorms and Rain': 0, 'Thunderstorms and Rain': 0, 'Heavy Thunderstorms and Rain': 0, 'Light Thunderstorms and Snow': 1, 'Thunderstorms and Snow': 1, 'Heavy Thunderstorms and Snow': 1, 'Light Thunderstorms and Ice Pellets': 1, 'Thunderstorms and Ice Pellets': 1, 'Heavy Thunderstorms and Ice Pellets': 1, 'Light Thunderstorms with Hail': 0, 'Thunderstorms with Hail': 0, 'Heavy Thunderstorms with Hail': 0, 'Light Thunderstorms with Small Hail': 0, 'Thunderstorms with Small Hail': 0, 'Heavy Thunderstorms with Small Hail': 0, 'Light Freezing Drizzle': 1, 'Freezing Drizzle': 1, 'Heavy Freezing Drizzle': 1, 'Light Freezing Rain': 1, 'Freezing Rain': 1, 'Heavy Freezing Rain': 1, 'Light Freezing Fog': 1, 'Freezing Fog': 1, 'Heavy Freezing Fog': 1, 'Patches of Fog': 0, 'Shallow Fog': 0, 'Partial Fog': 0, 'Overcast': 0, 'Clear': 0, 'Partly Cloudy': 0, 'Mostly Cloudy': 0, 'Scattered Clouds': 0, 'Small Hail ': 0, 'Squalls': 0, 'Funnel Cloud': 2, 'Unknown Precipitation': 2, 'Unknown ': 2}
+conditions = {'chanceflurries': 1, 'chancerain': 0, 'chancesleet': 1, 'chancesnow': 1, 'chancetstorms': 2, 'clear': 0, 'cloudy': 0, 'flurries': 1, 'fog': 0, 'hazy': 0, 'mostlycloudy': 0, 'mostlysunny': 0, 'partlycloudy': 0, 'partlysunny': 0, 'sleet': 1, 'rain': 0, 'snow': 1, 'sunny': 0, 'tstorms': 2, 'unknown': 2}
 update_interval = 180 #In seconds
 
 #GPIO
@@ -178,53 +218,69 @@ def brightnessUpdate():
 		time.sleep(1)
 
 def weather(): #Run the entirity of this function once every 3 minutes, or 180 seconds. 
-#		testalert = 'SVR' #If you want to test an alert type, uncomment tihs variable and the code below that refers to it. Take care to comment the code that it replaces, though. 
-		global strip
-		global defaultColor
-		time_marker = 0
-		while running == 1:
-			if time_marker + update_interval <= time.time():
-				time_marker = time.time()
-				try:
-					r = requests.get('http://api.wunderground.com/api/' + str(APIKEY) + '/alerts/hourly/q/' + str(STATE) + '/' + str(CITY) + '.json?apiref=0bcd59e502b38b2e')
-					# Parsing and displaying the probability of precip.
-#					alertval = str(r.json()['alerts'][0]['type']) 
-					pop = "Color(0, 0, " + str(int((float(str(r.json()['hourly_forecast'][0]['pop']))/100)*255)) + ")"
-					popval = r.json()['hourly_forecast'][0]['pop']
-					strip.setPixelColor(strip.numPixels() - 3, eval(pop))
-					# Checking for weather alerts, comparing them against my dictionary of color values, and displaying them.
-					strip.setPixelColor(strip.numPixels() - 2, eval(INDICATOR[str(r.json()['alerts'][0]['type'])]))
-#					strip.setPixelColor(strip.numPixels() - 2, eval(INDICATOR[testalert]))
-					alert = str(r.json()['alerts'][0]['type'])
-					if alert == 'TOR' or alert == 'WRN' or alert == 'FLO': 
-#					if str(testalert) == 'TOR' or str(testalert) == 'WRN' or str(testalert) == 'FLO': 
-						defaultColor = eval(INDICATOR[str(r.json()['alerts'][0]['type'])]) 
-#						print(INDICATOR[str(testalert)]) 
-#						defaultColor = eval(INDICATOR[str(testalert)])
-					else:
-						defaultColor = Color(255, 147, 41)
-				except IndexError:
-					print('Currently, there are no severe weather alerts for your area, though there is a', eval(popval), '% chance of precip.')
-#					print ", ".join('Currently, there are no severe weather alerts for your area, though there is a', eval(pop),'% chance of precip.')
-					defaultColor = Color(255, 147, 41) #We know of this error and there are no weather alerts, so make sure the second indicator is its normal color
-					pass
-				except requests.ConnectionError:
-					print("There's an issue with the network.")
-					defaultColor = Color(255, 0, 0) #Indicate an error
-					pass
-#				except requests.JSONDecodeError:
-				except ValueError:
-					print("There's an isse with the .json file we pulled down. Trying again in a few minutes.")
-					defaultColor = Color(255, 0, 0)
-					pass
-				except KeyError:
-					print("There's a weather situation, but it doesn't apply to this program.")
-					pass
-				except:
-					defaultColor = Color(255, 0, 0) #Indicate an error
-					raise
-			else:
-				time.sleep(1) 
+#	testalert = 'SVR' #If you want to test an alert type, uncomment tihs variable and the code below that refers to it. Take care to comment the code that it replaces, though. 
+	def precip():
+		input = str(r.json()['hourly_forecast'][0]['icon'])
+		if input in conditions:
+			precipType = conditions[input]
+			if precipType == 0:
+				precipColor = [0, 0, 255]
+			if precipType == 1:
+				precipColor = [245, 246, 255]
+			if precipType == 2:
+				precipColor = [255, 202, 32]
+			print precipColor #Debugging
+		pop = float(r.json()['hourly_forecast'][0]['pop'])/100
+		popIndic = "Color(" + str(int(precipColor[0] * pop)) + ", " + str(int(precipColor[1] * pop)) + ", " + str(int(precipColor[2] * pop)) + ")" 
+		print popIndic
+		return popIndic
+	global strip
+	global defaultColor
+	time_marker = 0
+	while running == 1:
+		if time_marker + update_interval <= time.time():
+			time_marker = time.time()
+			try:
+				r = requests.get('http://api.wunderground.com/api/' + str(APIKEY) + '/alerts/hourly/q/' + str(STATE) + '/' + str(CITY) + '.json?apiref=0bcd59e502b38b2e')
+				# Parsing and displaying the probability of precip.
+#				alertval = str(r.json()['alerts'][0]['type']) 
+#      				pop = "Color(0, 0, " + str(int((float(str(r.json()['hourly_forecast'][0]['pop']))/100)*255)) + ")"
+				popval = r.json()['hourly_forecast'][0]['pop']
+				strip.setPixelColor(strip.numPixels() - 3, eval(precip()))
+				# Checking for weather alerts, comparing them against my dictionary of color values, and displaying them.
+				strip.setPixelColor(strip.numPixels() - 2, eval(INDICATOR[str(r.json()['alerts'][0]['type'])]))
+#				strip.setPixelColor(strip.numPixels() - 2, eval(INDICATOR[testalert]))
+				alert = str(r.json()['alerts'][0]['type'])
+				if alert == 'TOR' or alert == 'WRN' or alert == 'FLO': 
+#				if str(testalert) == 'TOR' or str(testalert) == 'WRN' or str(testalert) == 'FLO': 
+					defaultColor = eval(INDICATOR[str(r.json()['alerts'][0]['type'])]) 
+#					print(INDICATOR[str(testalert)]) 
+#					defaultColor = eval(INDICATOR[str(testalert)])
+				else:
+					defaultColor = Color(255, 147, 41)
+			except IndexError:
+				print('Currently, there are no severe weather alerts for your area, though there is a', eval(popval), '% chance of precip.')
+#				print ", ".join('Currently, there are no severe weather alerts for your area, though there is a', eval(pop),'% chance of precip.')
+				defaultColor = Color(255, 147, 41) #We know of this error and there are no weather alerts, so make sure the second indicator is its normal color
+				pass
+			except requests.ConnectionError:
+				print("There's an issue with the network.")
+				defaultColor = Color(255, 0, 0) #Indicate an error
+				pass
+#			except requests.JSONDecodeError:
+			except ValueError:
+				print("There's an isse with the .json file we pulled down. Trying again in a few minutes.")
+				defaultColor = Color(255, 0, 0)
+				pass
+#				raise #Something's up. Need to debug it. 12-8-16
+			except KeyError:
+				print("There's a weather situation, but it doesn't apply to this program.")
+				pass
+			except:
+				defaultColor = Color(255, 0, 0) #Indicate an error
+				raise
+		else:
+			time.sleep(1) 
 
 # Supported Alerts
 # TOR - Tornado Warning
@@ -239,6 +295,7 @@ def weather(): #Run the entirity of this function once every 3 minutes, or 180 s
 #
 # Watches will consist of a solid color above the second indicator
 # Warnings will consist of a solid color above the second indicator as well as having the second indicator the same color
+
 def startThreads():
 	try:
 		global running

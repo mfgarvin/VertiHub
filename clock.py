@@ -14,44 +14,6 @@ off = Color(0, 0, 0)
 white = Color(255, 255, 255)
 placeholder = blue
 
-# Code Storage
-# Precip
-
-#print input in conditions
-#print conditions[input]
-#print popIndic
-#Temp
-#colorval = []
-#temp = 113 #This needs to be extrapolated from the WU data
-#def colorCalc(temp, focus):
-#	result = -abs((256/28)*temp - ((256/28) * focus)) + 256
-#	if result < 0: #If the result is subzero,
-#		result = 0
-#	return result
-#
-#def blueCalc(temp):
-#	return colorCalc(temp, 30)
-#
-#def greenCalc(temp):
-#	return colorCalc(temp, 60)
-#
-#def redCalc(temp):
-#	return colorCalc(temp,90)
-#
-#def whiteCalc(temp):
-#	if temp <= 30:
-#		return colorCalc(temp, 0)
-#	elif temp >= 90:
-#		return colorCalc(temp, 120)
-#colorval.insert(0, redCalc(temp) + whiteCalc(temp))
-#colorval.insert(1, greenCalc(temp) + whiteCalc(temp))
-#colorval.insert(2, blueCalc(temp) + whiteCalc(temp))
-##rgb = "Color(" + str(colorval[0]), str(colorval[1]), str(colorval[2]) + ")"
-#rgb = "Color(" + `colorval[0]` +", " +  `colorval[1]` + ", " + `colorval[2]` + ")"
-#print rgb
-##strip.setPixelColor(strip.numPixels() - 4, eval(rgb))
-
-
 #Weather Underground
 APIKEY = "36dbaf4c441591ef"
 CITY = "Wickliffe"
@@ -234,6 +196,31 @@ def weather(): #Run the entirity of this function once every 3 minutes, or 180 s
 		popIndic = "Color(" + str(int(precipColor[0] * pop)) + ", " + str(int(precipColor[1] * pop)) + ", " + str(int(precipColor[2] * pop)) + ")" 
 		print popIndic
 		return popIndic
+        def tempColor():
+                colorval = []
+                temp = int(r.json()['hourly_forecast'][0]['temp']['english'])
+                def colorCalc(temp, focus):
+                        result = -abs((256/28)*temp - ((256/28) * focus)) + 256
+                        if result < 0: #So, if the result is subzero,
+                                result = 0
+                        return result
+                def blueCalc(temp):
+                        return colorCalc(temp, 30)
+                def greenCalc(temp):
+                        return colorCalc(temp, 60)
+                def redCalc(temp):
+                        return colorCalc(temp, 90)
+                def whiteCalc(temp):
+	                if temp <= 30:
+        	                return colorCalc(temp, 0)
+                	elif temp >= 90:
+                        	return colorCalc(temp, 120)
+                colorval.insert(0, redCalc(temp) + whiteCalc(temp))
+                colorval.insert(1, greenCalc(temp) + whiteCalc(temp))
+                colorval.insert(2, blueCalc(temp) + whiteCalc(temp))
+                rgb = "Color(" + `colorval[0]` +", " +  `colorval[1]` + ", " + `colorval[2]` + ")"
+                print rgb
+		return rgb
 	global strip
 	global defaultColor
 	time_marker = 0
@@ -246,6 +233,7 @@ def weather(): #Run the entirity of this function once every 3 minutes, or 180 s
 #				alertval = str(r.json()['alerts'][0]['type']) 
 #      				pop = "Color(0, 0, " + str(int((float(str(r.json()['hourly_forecast'][0]['pop']))/100)*255)) + ")"
 				popval = r.json()['hourly_forecast'][0]['pop']
+				strip.setPixelColor(strip.numPixels() - 4, eval(tempColor()))
 				strip.setPixelColor(strip.numPixels() - 3, eval(precip()))
 				# Checking for weather alerts, comparing them against my dictionary of color values, and displaying them.
 				strip.setPixelColor(strip.numPixels() - 2, eval(INDICATOR[str(r.json()['alerts'][0]['type'])]))

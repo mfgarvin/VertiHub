@@ -32,7 +32,7 @@ LED_COUNT = 30 #Number of LED Pixels.
 LED_PIN = 18 #GPIO pin connected to the pixels (must support PWM!)
 LED_FREQ_HZ = 800000 #LED signal frequency in hertz (usually 800khz)
 LED_DMA = 5 #DMA channel to use for generating signal (try 5)
-LED_BRIGHTNESS = 100 #Set to 0 for darkest and 255 for brightest. 100 is the most my power supply will support.
+LED_BRIGHTNESS = 90 #Set to 0 for darkest and 255 for brightest. 100 is the most my power supply will support.
 LED_INVERT = False #True to invert the signal (when using NPN transistor level shift)
 
 strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
@@ -50,6 +50,7 @@ def updateClock():
 	hour = time.localtime().tm_hour
 	minute = time.localtime().tm_min
 	second = 'OFF'
+#	strip.begin()
 	#For Debugging
 #	print(time.localtime().tm_hour - 12, time.localtime().tm_min)
 	while running == 1:
@@ -62,7 +63,10 @@ def updateClock():
 			convertedHour = actualTime.tm_hour
 		if convertedHour - hour == 1 or convertedHour - hour == -11 or forceupdate == 1: 
 			hour = actualTime.tm_hour
-			strip.begin()#Reinit strip, clear it?
+#			strip.begin()#Reinit strip, clear it?
+			for n in range(0,26): #Clearing only the time portion of the strip
+				strip.setPixelColor(n,off)
+			strip.show()
 #			print('pre', hour)
 			if hour == 0:
 				hour = 12
@@ -191,36 +195,45 @@ def weather(): #Run the entirity of this function once every 3 minutes, or 180 s
 				precipColor = [245, 246, 255]
 			if precipType == 2:
 				precipColor = [255, 202, 32]
-			print precipColor #Debugging
+#			print precipColor #Debugging
 		pop = float(r.json()['hourly_forecast'][0]['pop'])/100
 		popIndic = "Color(" + str(int(precipColor[0] * pop)) + ", " + str(int(precipColor[1] * pop)) + ", " + str(int(precipColor[2] * pop)) + ")" 
-		print popIndic
+#		print popIndic
 		return popIndic
         def tempColor():
-                colorval = []
-                temp = int(r.json()['hourly_forecast'][0]['temp']['english'])
-                def colorCalc(temp, focus):
-                        result = -abs((256/28)*temp - ((256/28) * focus)) + 256
-                        if result < 0: #So, if the result is subzero,
-                                result = 0
-                        return result
-                def blueCalc(temp):
-                        return colorCalc(temp, 30)
-                def greenCalc(temp):
-                        return colorCalc(temp, 60)
-                def redCalc(temp):
-                        return colorCalc(temp, 90)
-                def whiteCalc(temp):
-	                if temp <= 30:
-        	                return colorCalc(temp, 0)
-                	elif temp >= 90:
-                        	return colorCalc(temp, 120)
-                colorval.insert(0, redCalc(temp) + whiteCalc(temp))
-                colorval.insert(1, greenCalc(temp) + whiteCalc(temp))
-                colorval.insert(2, blueCalc(temp) + whiteCalc(temp))
-                rgb = "Color(" + `colorval[0]` +", " +  `colorval[1]` + ", " + `colorval[2]` + ")"
-                print rgb
-		return rgb
+		try:
+	                colorval = []
+	                temp = int(r.json()['hourly_forecast'][0]['temp']['english'])
+			print temp
+	                def colorCalc(temp, focus):
+        	                result = -abs((256/28)*temp - ((256/28) * focus)) + 256
+                	        if result < 0: #So, if the result is subzero,
+                        	        result = 0
+	                        return result
+        	        def blueCalc(temp):
+                	        return colorCalc(temp, 30)
+	                def greenCalc(temp):
+        	                return colorCalc(temp, 60)
+                	def redCalc(temp):
+	                        return colorCalc(temp, 90)
+        	        def whiteCalc(temp):
+	        	        if temp <= 30:
+        	        	        return colorCalc(temp, 0)
+	                	elif temp >= 90:
+        	                	return colorCalc(temp, 120)
+				else:
+					return 0
+	                colorval.insert(0, redCalc(temp) + whiteCalc(temp))
+        	        colorval.insert(1, greenCalc(temp) + whiteCalc(temp))
+                	colorval.insert(2, blueCalc(temp) + whiteCalc(temp))
+	                rgb = "Color(" + `colorval[0]` +", " +  `colorval[1]` + ", " + `colorval[2]` + ")"
+#        	        print rgb
+			return rgb
+		except:
+#			print ("There's been an error in the tempColor function.")
+#			rgb = "Color(0, 0, 0)"
+#			return rgb
+			raise
 	global strip
 	global defaultColor
 	time_marker = 0

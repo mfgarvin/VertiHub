@@ -4,6 +4,8 @@ import threading
 import math
 import RPi.GPIO as GPIO
 import requests
+import os
+import spidev
 defaultColor = Color(255, 147, 41)
 minuteColor = Color(255, 147, 41)
 hourColor = Color(255, 147, 41)
@@ -25,7 +27,12 @@ update_interval = 180 #In seconds
 
 #GPIO
 GPIO.setmode(GPIO.BCM)
-lightSensPin = 25
+
+#SPI
+spi = spidev.SpiDev()
+spi.open(0,0)
+light_channel = 0
+update_delay = 0.5
 
 #LED strip configuration:
 LED_COUNT = 30 #Number of LED Pixels.
@@ -139,18 +146,23 @@ def updateClock():
 		time.sleep(1)
 
 def brightnessUpdate():
-	def lightSens(x):
-		global running
-		while running == 1:
-			reading = 0
-			GPIO.setup(x, GPIO.OUT)
-			GPIO.output(x, GPIO.LOW)
-			time.sleep(0.1)
-			GPIO.setup(x, GPIO.IN)
-			while (GPIO.input(x) == GPIO.LOW):
-				reading += 1
-				time.sleep(0.5)
-			return reading
+	def ReadChannel(channel):
+		adc = spi.xfer2([1,(8+channel)<<4,0])
+		data = ((adc[1]&3) << 8) + adc[2]
+		return data
+	def ConvertedVolts(data,places):
+		volts = (data * 3.3) / float(1023)
+		volts = round(volts,places)
+		return volts	
+	def ReadLight():
+		light_level = ReadChannel(light_channel)
+		light_volts = ConvertedVolts
+		#Print the results (debugging)
+		#print "------------"
+		#print("Light: {} ({}V)".format(light_level,light_volts
+		#Return the result instead
+		return light_level
+
 	def averageBrightness():
 		global running
 		brightness = []
@@ -161,22 +173,24 @@ def brightnessUpdate():
 					time.sleep(0.1)
 			return float(sum(brightness)/len(brightness))
 	#Variables for following equation
-	a = 103.1389768
-	b = 0.9695655616
+	a = 100.45162
+#	a = 164.696634
+	b = -0.004506
+#	b = -0.004989
 	global strip
 	global forceupdate
 	firstrun = 1
-	ambientLight1 = averageBrightness()
+	ambientLight1 = ReadLight()
 	while running == 1:
-		ambientLight2 = averageBrightness()
+		ambientLight2 = ReadLight()
 		if ambientLight1 != ambientLight2 or firstrun == 1:
 			ambientLight1 = ambientLight2
-			adjustedBrightness = math.ceil(a * math.pow(b,ambientLight2))
+			adjustedBrightness = math.ceil(a * math.pow(math.e,b*ambientLight2))
 			if adjustedBrightness > 100:
 				adjustedBrightness = 100
 			strip.setBrightness(int(adjustedBrightness))
 			strip.show()
-			print ('Brightness -', adjustedBrightness)
+#			print ('Brightness -', adjustedBrightness)
 			if firstrun == 1:
 				firstrun = 0
 		else:
@@ -263,6 +277,7 @@ def weather(): #Run the entirity of this function once every 3 minutes, or 180 s
 				print('Currently, there are no severe weather alerts for your area, though there is a', eval(popval), '% chance of precip.')
 #				print ", ".join('Currently, there are no severe weather alerts for your area, though there is a', eval(pop),'% chance of precip.')
 				defaultColor = Color(255, 147, 41) #We know of this error and there are no weather alerts, so make sure the second indicator is its normal color
+				strip.setPixelColor(strip.numPixels() - 2, Color(255,147,41))
 				pass
 			except requests.ConnectionError:
 				print("There's an issue with the network.")

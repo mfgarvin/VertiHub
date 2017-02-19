@@ -172,7 +172,8 @@ def brightnessUpdate():
 					brightness.append(lightSens(lightSensPin))
 					time.sleep(0.1)
 			return float(sum(brightness)/len(brightness))
-	#Variables for following equation
+#y = -0.00007322x^2 - 0.02277x + 100.0	#Variables for following equation
+#	math.ceil(math.pow(-0.00007322 * x,2) - 0.02277 * x + 100.0)
 	a = 100.45162
 #	a = 164.696634
 	b = -0.004506
@@ -185,12 +186,13 @@ def brightnessUpdate():
 		ambientLight2 = ReadLight()
 		if ambientLight1 != ambientLight2 or firstrun == 1:
 			ambientLight1 = ambientLight2
-			adjustedBrightness = math.ceil(a * math.pow(math.e,b*ambientLight2))
+			adjustedBrightness = -0.00007322 * math.pow(ambientLight2,2) - 0.02277 * ambientLight2 + 100.0
+#			adjustedBrightness = math.ceil(a * math.pow(math.e,b*ambientLight2))
 			if adjustedBrightness > 100:
 				adjustedBrightness = 100
 			strip.setBrightness(int(adjustedBrightness))
 			strip.show()
-#			print ('Brightness -', adjustedBrightness)
+			print ('Brightness -', adjustedBrightness)
 			if firstrun == 1:
 				firstrun = 0
 		else:
